@@ -80,3 +80,30 @@ def test_add_screening(client, cinema, movie):
     assert Screening.objects.count() == existing_screenings + 1
     for key, value in screening.items():
         assert key in response.data
+
+
+@pytest.mark.django_db
+def test_get_screening_detail(client, screening):
+    response = client.get(f"/screening/{screening.id}/", {}, format='json')
+    assert response.status_code == 200
+    for field in ('movie', 'cinema', 'date'):
+        assert field in response.data
+
+
+@pytest.mark.django_db
+def test_delete_screening(client, screening):
+    response = client.delete(f'/screening/{screening.id}/', {}, format='json')
+    assert response.status_code == 204
+    assert Screening.objects.filter(id=screening.id).count() == 0
+
+
+@pytest.mark.django_db
+def test_update_screening(client, screening):
+    response = client.get(f"/screening/{screening.id}/", {}, format='json')
+    screening_data = response.data
+    new_cinema = Cinema.objects.create(name='new_cinema', city='new_city')
+    screening_data["cinema"] = new_cinema.name
+    response = client.patch(f"/screening/{screening.id}/", screening_data, format='json')
+    assert response.status_code == 200
+    screening_obj = Screening.objects.get(id=screening.id)
+    assert screening_obj.cinema == new_cinema

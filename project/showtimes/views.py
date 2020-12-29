@@ -16,3 +16,8 @@ class CinemaView(generics.RetrieveUpdateDestroyAPIView):
 class ScreeningListView(generics.ListCreateAPIView):
     queryset = Screening.objects.all()
     serializer_class = ScreeningSerializer
+
+
+class ScreeningView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Screening.objects.all()
+    serializer_class = ScreeningSerializer

@@ -21,11 +21,9 @@ def cinema():
 
 
 @pytest.fixture
-def screening():
-    test_movie = fake_movie_data()
-    test_cinema = cinema()
+def screening(cinema, movie):
     date = datetime.now()
-    screening = Screening.objects.create(movie=test_movie, cinema=test_cinema, date=date)
+    screening = Screening.objects.create(movie=movie, cinema=cinema, date=date)
     return screening
 
 
