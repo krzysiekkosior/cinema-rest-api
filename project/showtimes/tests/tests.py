@@ -1,13 +1,15 @@
-import pytest
-from rest_framework.utils import json
+from datetime import datetime
 
+import pytest
+
+from movielist.models import Movie
+from movielist.tests.utils import fake_movie_data
 from showtimes.models import Cinema, Screening
 
 
 @pytest.mark.django_db
 def test_get_cinema_list(client, cinema):
     response = client.get('/cinemas/', {}, format='json')
-    # response = client.get('/cinemas/', {"format": 'json'})
     data = response.data[0]
     assert response.status_code == 200
     assert Cinema.objects.count() == len(response.data)
@@ -56,3 +58,25 @@ def test_update_cinema(client, cinema):
     response = client.patch(f"/cinemas/{test_cinema.id}/", cinema_data, format='json')
 
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_get_screening_list(client, set_up):
+    response = client.get('/screenings/', {}, format='json')
+    assert response.status_code == 200
+    assert Screening.objects.count() == len(response.data)
+
+
+@pytest.mark.django_db
+def test_add_screening(client, cinema, movie):
+    existing_screenings = Screening.objects.count()
+    screening = {
+        'movie': movie.title,
+        'cinema': cinema.name,
+        'date': datetime.today().date()
+    }
+    response = client.post('/screenings/', screening, format='json')
+    assert response.status_code == 201
+    assert Screening.objects.count() == existing_screenings + 1
+    for key, value in screening.items():
+        assert key in response.data
