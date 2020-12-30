@@ -8,7 +8,7 @@ class CinemaSerializer(serializers.ModelSerializer):
     movies = serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
-        view_name='cinema-detail'
+        view_name='movies-detail'
     )
 
     class Meta:
